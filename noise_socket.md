@@ -1,8 +1,6 @@
 ---
 title:      'The Noise Socket Protocol'
-author:     'Alexey Ermishkin (scratch@virgilsecurity.com)'
-revision:   '0'
-date:       '2017-01-31'
+
 ---
 
 
