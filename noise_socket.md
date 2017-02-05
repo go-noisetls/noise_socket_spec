@@ -36,14 +36,14 @@ choose one:
 First NoiseSocket message:
  - 2 bytes big-endian length of following data (N)
  - Repeat:
-   - 1 byte version of following message (zero initially; sorted in
-increasing order)
+   - 1 byte length of the following string, indicating the ciphersuite/protocol used, i.e. message type (Tl)
+   - L bytes string indicating message type (T)
    - 2 bytes big-endian length of following message (DHLEN initially;
 may be zero)
    - <Noise message>
 
 Second NoiseSocket message:
- - 1 byte version (zero initially)
+ - 1 byte index of the message that responder responds to
  - 2 bytes big-endian length of following message
  - <Noise message>
 
@@ -51,26 +51,20 @@ All subsequent messages:
  - 2 bytes big-endian length of following message
  - <Noise message>
 
-The Noise "prologue" will be calculated as:
- - 1 byte indicating the number of versions offered in the first message
- - A list of bytes, one for each message.
+The Noise "prologue" will be calculated as a concatenation of all T string of the first message
 
-For example, the initial prologue will be 0x0100 (1 version, version
-0).  We don't include the entire NoiseSocket message so that the
-prologue can be fixed to allow for encrypted initial messages, in the
-future.  This means servers must decide which version to support based
-purely on version numbers, not message contents.
+
 
 
 EXAMPLES:
 
- * Suppose the client wants to offer a new protocol version (1).  It
-simply appends the version 1 initial message to the version 0 initial
+ * Suppose the client wants to offer a new protocol version.  It
+simply appends the new version initial message to the first initial
 message, and sends them both in the initial NoiseSocket message.  The
 server responds to the highest version it recognizes.
 
- * Suppose the client wants to offer three new ciphers (version 1-3)
-but reuse the version 0 DH.  The client can send version indicators
+ * Suppose the client wants to offer three new ciphers 
+but reuse the version 0 DH. The client can send version indicators
 for 1-3, each followed by a zero-length message, reusing the version 0
 message's ephemeral public value.
 
