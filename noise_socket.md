@@ -91,6 +91,8 @@ The handshake process consists of set of messages which client and server send t
 
 In the **First handshake message** client offers server a set of sub-messages, each of which corresponds to a concrete [Noise protocol](http://noiseprotocol.org/noise.html#protocol-names)
 
+The amount of sub-messages is stored in a 1-byte value N, right after padding.
+
 Each handshake sub-message contains following fields:
    - 1 byte length of the following string, indicating the ciphersuite/protocol used, i.e. message type (Tl)
    - L bytes string indicating message type (T)
@@ -102,7 +104,7 @@ Each handshake sub-message contains following fields:
 First handshake message full structure:
 ```
 =================PACKET=============================================================================
-[2 bytes len] | [2 bytes padding len] [padding] ...n times... ([ 1 byte Tl] [T] [Ml] [M])
+[2 bytes len] | [2 bytes padding len] [padding] ...N times... ([ 1 byte Tl] [T] [Ml] [M])
                 ====================================PAYLOAD=========================================
 ```
 
