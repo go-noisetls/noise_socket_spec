@@ -116,7 +116,7 @@ Second packet structure:
 Second handshake message full structure:
  ```
 =================PACKET=============================================================================
-[2 bytes len] | [2 bytes padding len] [padding] [1 byte index] [handshake nessage]
+[2 bytes len] | [2 bytes padding len] [padding] [1 byte index] [handshake message]
                 ====================================PAYLOAD=========================================
 ```
 
@@ -129,7 +129,7 @@ After client gets server response there's no longer need in extra transport fiel
 ```
  
  
-3 messages ndde to be sent and received to implent full Noise_XX handshake.
+3 messages are needed to be sent and received to implement full Noise_XX handshake.
 
 
 6. Data packets
