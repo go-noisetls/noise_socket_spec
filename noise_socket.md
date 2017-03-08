@@ -31,60 +31,19 @@ Traffic in Noise Socket is split into packets each less than or equal to 65535 b
 
 All sizes are in big endian form.
 
-3. Packet structure
+3. Handshake packet structure
 ---------------------------
 
 - 2 bytes packet size (Ps)
-- 2 bytes padding size(PDs)
-- PDs size padding (PD)
-- Actual data
-- Optional MAC
+- data
 
 ```
-=================PACKET==========
-[Ps] | [PDs] [PD] [data] [MAC] |
-      =============PAYLOAD=======
+=====PACKET====
+[Ps] | [data] 
+      =PAYLOAD=
 ```
 
-The payload is not encrypted during the handshake and encrypted afterwards.
-Each payload starts with padding len. Padding len is mandatory, but the padding itself is optional. It is done to simplify packet parsing.
-MAC is added only if the payload is encrypted.
-
-4. Padding
----------------------------
- - Padding aligns payload to a certain predefined size to make packets indistinguishable from each other. For example, all packets can have size which is a multiple of 1024 or always be 10 kilobytes.
-
-A sample algorithm to calculate padding considering all packet fields is the following:
-```
-Const
-MaxPayloadSize = 65535
-
-Input: 
-paddingMultiplier, //ex: 1024
-overheadSize, // 16 if MAC is added, 0 otherwise
-dataSize // the size of plaintext data to be sent.
-
-
-Start:
-
-payloadSize = 2 + dataSize + overheadSize 
-
-if paddingMultiplier > 0 {
-		paddingSize = paddingMultiplier - payloadSize mod paddingMultiplier
-		if payloadSize+paddingSize > MaxPayloadSize {
-			paddingSize = MaxPayloadSize - payloadSize
-		}
-	}
-
-totalPacketSize = 2 + paddingSize + payloadSize
-
-dataOffset = 2 + 2 + paddingSize // where to place the data and MAC after it
-
-```
-
-2 is the size of size fields
-
-5. Handshake packets
+4. Handshake packets
 ---------------------------
 
 The handshake process consists of set of messages which client and server send to each other. First two of them have a specific payload structure
@@ -133,8 +92,7 @@ After client gets server response there's no longer need in extra transport fiel
  
 3 messages are needed to be sent and received to implement full Noise_XX handshake.
 
-
-6. Data packets
+5. Data packets
 ---------------------
 
 After handshake is complete and both [Cipher states](http://noiseprotocol.org/noise.html#the-cipherstate-object) are created, all following packets must be encrypted.
@@ -144,6 +102,43 @@ The maximum amount of plaintext data that can be sent in one packet is
 ```
 65535 - 2(padding size) - 16 (mac size) = 65517 bytes
 ```
+
+6. Padding
+---------------------------
+
+- Padding is the part of encrypted  data packet payload.
+
+ - Padding aligns payload to a certain predefined size to make encrypted packets indistinguishable from each other. For example, all packets can have size which is a multiple of 1024 or always be 10 kilobytes.
+
+A sample algorithm to calculate padding considering all packet fields is the following:
+```
+Const
+MaxPayloadSize = 65535
+
+Input: 
+paddingMultiplier, //ex: 1024
+overheadSize, // 16 if MAC is added, 0 otherwise
+dataSize // the size of plaintext data to be sent.
+
+
+Start:
+
+payloadSize = 2 + dataSize + overheadSize 
+
+if paddingMultiplier > 0 {
+		paddingSize = paddingMultiplier - payloadSize mod paddingMultiplier
+		if payloadSize+paddingSize > MaxPayloadSize {
+			paddingSize = MaxPayloadSize - payloadSize
+		}
+	}
+
+totalPacketSize = 2 + paddingSize + payloadSize
+
+dataOffset = 2 + 2 + paddingSize // where to place the data and MAC after it
+
+```
+
+2 is the size of size fields
 
 7. Re-keying
 -------------------
