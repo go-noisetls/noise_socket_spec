@@ -8,8 +8,10 @@ title:      'The Noise Socket Protocol'
 ================
 
 Noise Socket is a secure transport layer protocol that is much simplier than TLS,
-easier to implement and does not require certificates. Only raw public keys can
-be used to establish secure connection.
+easier to implement.
+The communicating parties are identified by raw public keys, with the option to provide certificates during the
+initial handshake
+
 
 It is useful in IoT, as TLS replacement in microservice architecture, messaging
 and other cases where TLS looks overcomplicated.
@@ -50,8 +52,6 @@ The handshake process consists of set of messages which client and server send t
 
 In the **First handshake message** client offers server a set of sub-messages, each of which corresponds to a concrete [Noise protocol](http://noiseprotocol.org/noise.html#protocol-names)
 
-The amount of sub-messages is stored in a 1-byte value N, right after padding.
-
 Each handshake sub-message contains following fields:
    - 1 byte length of the following string, indicating the ciphersuite/protocol used, i.e. message type (Tl)
    - L bytes string indicating message type (T)
@@ -63,7 +63,7 @@ Each handshake sub-message contains following fields:
 First handshake message full structure:
 ```
 =================PACKET=============================================================================
-[2 bytes len] | [2 bytes padding len] [padding] ...N times... ([ 1 byte Tl] [T] [Ml] [M])
+[2 bytes len] | ...N times... ([ 1 byte Tl] [T] [Ml] [M])
                 ====================================PAYLOAD=========================================
 ```
 
@@ -77,7 +77,7 @@ Second packet structure:
 Second handshake message full structure:
  ```
 =================PACKET=============================================================================
-[2 bytes len] | [2 bytes padding len] [padding] [1 byte index] [handshake message]
+[2 bytes len] | [1 byte index] [handshake message]
                 ====================================PAYLOAD=========================================
 ```
 
@@ -85,14 +85,20 @@ After client gets server response there's no longer need in extra transport fiel
 
  ```
 =================PACKET=============================================================================
-[2 bytes len] | [2 bytes padding len] [padding] [handshake nessage]
+[2 bytes len] | [handshake nessage]
                 ====================================PAYLOAD=========================================
 ```
  
  
 3 messages are needed to be sent and received to implement full Noise_XX handshake.
+2 mesages  are needed to be sent and received to implement full Noise_IK handshake.
 
-5. Data packets
+5. Handshake payload protection
+---------------------
+ - During XX handshake, only second and third messages may contain payloads. The first wold be sent in clear
+ - During IK handshake, first and second messages may contain payloads.
+ 
+6. Data packets
 ---------------------
 
 After handshake is complete and both [Cipher states](http://noiseprotocol.org/noise.html#the-cipherstate-object) are created, all following packets must be encrypted.
@@ -103,7 +109,7 @@ The maximum amount of plaintext data that can be sent in one packet is
 65535 - 2(padding size) - 16 (mac size) = 65517 bytes
 ```
 
-6. Padding
+7. Padding
 ---------------------------
 
 - Padding is the part of encrypted  data packet payload.
@@ -140,7 +146,7 @@ dataOffset = 2 + 2 + paddingSize // where to place the data and MAC after it
 
 2 is the size of size fields
 
-7. Re-keying
+8. Re-keying
 -------------------
 
 ...
