@@ -106,45 +106,35 @@ After handshake is complete and both [Cipher states](http://noiseprotocol.org/no
 The maximum amount of plaintext data that can be sent in one packet is
 
 ```
-65535 - 2(padding size) - 16 (mac size) = 65517 bytes
+65535 - 4(header size) - 16 (mac size) = 65515 bytes
 ```
 
-7. Padding
+7. Payload fields
 ---------------------------
+Each encrypted handshake payload as well as every encrypted transport message consists of 1 or more fields.
+Every field has the following structure:
 
-- Padding is the part of encrypted  data packet payload.
+ - 2 byte Size (including type)
+ - 2 byte Sub-message type
+ - Contents
+ 
+ The minimum field size is 4 bytes (0 bytes of field payload data).  The total size of all fields must not exceed Ps - MACsize.
+ 
+ Each Noise Socket implementation must support the following two message sub-types:
+ 0: Padding
+ 1: Data
 
- - Padding aligns payload to a certain predefined size to make encrypted packets indistinguishable from each other. For example, all packets can have size which is a multiple of 1024 or always be 10 kilobytes.
+The minimum field size is 4 bytes (0 bytes of field payload data).  The total size of all fields must not exceed Ps - MACsize.
 
-A sample algorithm to calculate padding considering all packet fields is the following:
-```
-Const
-MaxPayloadSize = 65535
+Message types 0 to 1023 are reserved for use in this and future versions of the NoiseSocket specification.  Message types 1024 to 65535 are application-defined.
 
-Input: 
-paddingMultiplier, //ex: 1024
-overheadSize, // 16 if MAC is added, 0 otherwise
-dataSize // the size of plaintext data to be sent.
+This version of the specification defines message type **0** as padding.  The field payload data is ignored and should contain random bytes.  If the overall message length would have 1 to 3 bytes left over once all fields are parsed, those bytes will also contain random padding without a field header.
 
+Message type **1** is assigned to the primary data channel within the session if the application does not have its own way of identifying separate channels.
 
-Start:
+A minimal implementation of NoiseSocket supports message types 0 and 1 to provide a TLS-style transparent data link.  More complex applications may forbid the use of message type 1 and use their own message types for identifying separate channels of communication.  Padding must always be supported.
 
-payloadSize = 2 + dataSize + overheadSize 
-
-if paddingMultiplier > 0 {
-		paddingSize = paddingMultiplier - payloadSize mod paddingMultiplier
-		if payloadSize+paddingSize > MaxPayloadSize {
-			paddingSize = MaxPayloadSize - payloadSize
-		}
-	}
-
-totalPacketSize = 2 + paddingSize + payloadSize
-
-dataOffset = 2 + 2 + paddingSize // where to place the data and MAC after it
-
-```
-
-2 is the size of size fields
+This format is also used in handshake message payloads if the payload size is non-zero.
 
 8. Re-keying
 -------------------
