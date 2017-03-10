@@ -122,7 +122,9 @@ Every field has the following structure:
 The minimum field size is 4 bytes (0 bytes of field payload data).  The total size of all fields must not exceed Ps - MACsize.
  
  Each Noise Socket implementation must support the following two message sub-types:
+ 
  `0: Padding`
+ 
  `1: Primary data channel`
 
 The minimum field size is 4 bytes (0 bytes of field payload data).  The total size of all fields must not exceed Ps - MACsize.
