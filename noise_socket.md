@@ -94,7 +94,7 @@ After client gets server response there's no longer need in extra transport fiel
 2 mesages  are needed to be sent and received to implement full Noise_IK handshake.
 
 5. Prologue
-
+---------------------
 Noise [prologue](http://noiseprotocol.org/noise.html#prologue) is calculated as follows:
 - 1 byte amount of message types (N)
 - N times:
@@ -107,12 +107,12 @@ Noise [prologue](http://noiseprotocol.org/noise.html#prologue) is calculated as 
 </details>
 
 
-5. Handshake payload protection
+6. Handshake payload protection
 ---------------------
  - During XX handshake, only second and third messages may contain payloads. The first wold be sent in clear
  - During IK handshake, first and second messages may contain payloads.
  
-6. Data packets
+7. Data packets
 ---------------------
 
 After handshake is complete and both [Cipher states](http://noiseprotocol.org/noise.html#the-cipherstate-object) are created, all following packets must be encrypted.
@@ -123,7 +123,7 @@ The maximum amount of plaintext data that can be sent in one packet is
 65535 - 4(header size) - 16 (mac size) = 65515 bytes
 ```
 
-7. Payload fields
+8. Payload fields
 ---------------------------
 Each encrypted handshake payload as well as every encrypted transport message consists of 1 or more fields.
 Every field has the following structure:
@@ -153,7 +153,7 @@ A minimal implementation of NoiseSocket supports message types 0 and 1 to provid
 
 This format is also used in handshake message payloads if the payload size is non-zero.
 
-8. Re-keying
+9. Re-keying
 -------------------
 
 ...
