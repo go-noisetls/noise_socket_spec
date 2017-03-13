@@ -68,9 +68,11 @@ First handshake message full structure:
 ```
 
  
-In the **Second handshake message** server responds to client with the handshake message index it chose and the response itself.
+In the **Second handshake message** server responds to client with the following structure
+
 Second packet structure:
  - 1 byte index of the message that responder responds to
+ - 1 byte message type it sends in case server supports noise pipes. See section [9.2](http://noiseprotocol.org/noise.html#compound-protocols-and-noise-pipes) of the original doc. 0 if server accepted IK message, 1 if it started XX_Fallback
  - **Noise message**
  
  
@@ -102,7 +104,7 @@ Noise [prologue](http://noiseprotocol.org/noise.html#prologue) is calculated as 
   -- L bytes message type (Noise protocol string)
 
 <details> 
- <summary>An example of such prologue would be: (in HEX) </summary>
+ <summary>An example of such prologue would be: (expand to view in HEX) </summary>
 101c4e6f6973655f58585f32353531395f41455347434d5f5348413235361d4e6f6973655f58585f32353531395f41455347434d5f424c414b4532621c4e6f6973655f58585f32353531395f41455347434d5f5348413531321d4e6f6973655f58585f32353531395f41455347434d5f424c414b453273204e6f6973655f58585f32353531395f436861436861506f6c795f534841323536214e6f6973655f58585f32353531395f436861436861506f6c795f424c414b453262204e6f6973655f58585f32353531395f436861436861506f6c795f534841353132214e6f6973655f58585f32353531395f436861436861506f6c795f424c414b4532731c4e6f6973655f494b5f32353531395f41455347434d5f5348413235361d4e6f6973655f494b5f32353531395f41455347434d5f424c414b4532621c4e6f6973655f494b5f32353531395f41455347434d5f5348413531321d4e6f6973655f494b5f32353531395f41455347434d5f424c414b453273204e6f6973655f494b5f32353531395f436861436861506f6c795f534841323536214e6f6973655f494b5f32353531395f436861436861506f6c795f424c414b453262204e6f6973655f494b5f32353531395f436861436861506f6c795f534841353132214e6f6973655f494b5f32353531395f436861436861506f6c795f424c414b453273
 </details>
 
